@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 /**
  * 用户
@@ -48,8 +48,8 @@ public class UserEntity implements UserDetails {
     /**
      * 车辆列表
      */
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<CarEntity> carList;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<CarEntity> carList;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

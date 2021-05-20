@@ -24,15 +24,9 @@ public class CarEntity {
     private String licensePlate;
 
     /**
-     * 用户
-     */
-    @OneToOne
-    private UserEntity user;
-
-    /**
      * 停车位预约列表
      */
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ParkingReservationEntity> parkingReservationList;
 
 }

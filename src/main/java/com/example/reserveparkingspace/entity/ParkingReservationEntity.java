@@ -19,6 +19,11 @@ public class ParkingReservationEntity {
     private Long id;
 
     /**
+     * 停车位序号（内置）
+     */
+    private Integer parkingSpaceNumber;
+
+    /**
      * 开始时间
      */
     private LocalDateTime startTime;
@@ -27,11 +32,5 @@ public class ParkingReservationEntity {
      * 结束时间
      */
     private LocalDateTime endTime;
-
-    /**
-     * 车辆
-     */
-    @OneToOne
-    private CarEntity car;
 
 }

@@ -2,8 +2,8 @@ package com.example.reserveparkingspace.controller;
 
 import lombok.Data;
 
-import javax.validation.constraints.Future;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
@@ -29,13 +29,13 @@ public class ParkingRequest {
     /**
      * 开始时间
      */
-    @Future
+    @NotNull
     private LocalDateTime startTime;
 
     /**
      * 结束时间
      */
-    @Future
+    @NotNull
     private LocalDateTime endTime;
 
 }
