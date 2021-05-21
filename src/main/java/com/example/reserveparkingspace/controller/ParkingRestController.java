@@ -1,6 +1,7 @@
 package com.example.reserveparkingspace.controller;
 
 import com.example.reserveparkingspace.entity.CarEntity;
+import com.example.reserveparkingspace.entity.ParkingReservationEntity;
 import com.example.reserveparkingspace.entity.UserEntity;
 import com.example.reserveparkingspace.other.ParkingRequest;
 import com.example.reserveparkingspace.repository.ParkingReservationRepo;
@@ -17,10 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**
  * parking restController
@@ -43,7 +41,7 @@ public class ParkingRestController {
     private UserRepo userRepo;
 
     @PostMapping("/parking")
-    public ResponseEntity<String> parking(@RequestBody @Valid ParkingRequest parkingRequest) {
+    public ResponseEntity<String> parking(@RequestBody @Valid ParkingRequest parkingRequest, Authentication authentication) {
         final LocalDateTime startTime = parkingRequest.getStartTime();
         final LocalDateTime endTime = parkingRequest.getEndTime();
         final int year = LocalDateTime.now().getYear();
@@ -64,10 +62,37 @@ public class ParkingRestController {
             return ResponseEntity.badRequest().body("目前暂不开放预约");
         }
 
+        // 判断该时间段是否存在预约冲突
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        Optional<CarEntity> carFirst = user.getCarList().stream()
+                .filter(carEntity -> carEntity.getLicensePlate().equals(parkingRequest.getLicensePlate()))
+                .findFirst();
+
+        if (carFirst.isPresent()) {
+            Optional<ParkingReservationEntity> parkingFirst = carFirst.get().getParkingReservationList().stream()
+                    .filter(entity -> {
+                        if ((entity.getStartTime().isBefore(parkingRequest.getStartTime()) || entity.getStartTime().isEqual(parkingRequest.getStartTime()))
+                                && (entity.getEndTime().isAfter(parkingRequest.getStartTime()))) {
+                            return true;
+                        }
+
+                        return (entity.getStartTime().isBefore(parkingRequest.getEndTime()) || entity.getStartTime().isEqual(parkingRequest.getEndTime()))
+                                && (entity.getEndTime().isAfter(parkingRequest.getEndTime()));
+                    })
+                    .findFirst();
+
+            if (parkingFirst.isPresent()) {
+                return ResponseEntity.badRequest().body("抱歉预约失败");
+            }
+        }
+
         // 判断是否有空余时间段的停车位
         List<Integer> remainingNumbers = new ArrayList<>(parkingSpaces);
         for (int i = 0; i < parkingSpaces; i++) {
-            if (!parkingReservationRepo.existsByParkingSpaceNumberAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(i, startTime, startTime)) {
+            if (
+                    !parkingReservationRepo.existsByParkingSpaceNumberAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(i, startTime, startTime) ||
+                            !parkingReservationRepo.existsByParkingSpaceNumberAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(i, endTime, endTime)
+            ) {
                 // 记录该时间段可以停车的车位号
                 remainingNumbers.add(i);
             }
