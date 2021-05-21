@@ -1,6 +1,8 @@
 package com.example.reserveparkingspace.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.List;
  */
 @Data
 @Entity
+@EqualsAndHashCode(exclude = "parkingReservationList")
 public class CarEntity {
 
     @Id
@@ -26,7 +29,14 @@ public class CarEntity {
     /**
      * 停车位预约列表
      */
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ParkingReservationEntity> parkingReservationList;
+
+    /**
+     * 用户
+     */
+    @JsonIgnore
+    @ManyToOne
+    private UserEntity user;
 
 }

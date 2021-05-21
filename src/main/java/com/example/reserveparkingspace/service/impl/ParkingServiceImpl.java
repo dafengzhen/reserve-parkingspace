@@ -1,9 +1,9 @@
 package com.example.reserveparkingspace.service.impl;
 
-import com.example.reserveparkingspace.controller.ParkingRequest;
 import com.example.reserveparkingspace.entity.CarEntity;
 import com.example.reserveparkingspace.entity.ParkingReservationEntity;
 import com.example.reserveparkingspace.entity.UserEntity;
+import com.example.reserveparkingspace.other.ParkingRequest;
 import com.example.reserveparkingspace.repository.CarRepo;
 import com.example.reserveparkingspace.repository.ParkingReservationRepo;
 import com.example.reserveparkingspace.repository.UserRepo;
@@ -13,7 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * parking service implement
@@ -45,20 +46,22 @@ public class ParkingServiceImpl implements ParkingService {
         parking.setStartTime(parkingRequest.getStartTime());
         parking.setEndTime(parkingRequest.getEndTime());
 
-        if (user.getCarList().isEmpty()) {
-            CarEntity car = carRepo.findByLicensePlate(parkingRequest.getLicensePlate()).orElseGet(() -> {
-                CarEntity carEntity = new CarEntity();
-                carEntity.setLicensePlate(parkingRequest.getLicensePlate());
-                carEntity.setParkingReservationList(Collections.singletonList(parking));
-                return carEntity;
-            });
+        Optional<CarEntity> first = user.getCarList().stream()
+                .filter(carEntity -> carEntity.getLicensePlate().equals(parkingRequest.getLicensePlate()))
+                .findFirst();
 
-            car.getParkingReservationList().add(parking);
-            user.getCarList().add(car);
+        if (first.isPresent()) {
+            parking.setCar(first.get());
+            parkingReservationRepo.save(parking);
         } else {
-            user.getCarList().stream()
-                    .filter(carEntity -> carEntity.getLicensePlate().equals(parkingRequest.getLicensePlate()))
-                    .findFirst().ifPresent(carEntity -> carEntity.getParkingReservationList().add(parking));
+            CarEntity car = new CarEntity();
+            car.setLicensePlate(parkingRequest.getLicensePlate());
+
+            parking.setCar(car);
+            car.setUser(user);
+
+            parkingReservationRepo.save(parking);
+            carRepo.save(car);
         }
 
         userRepo.save(user);

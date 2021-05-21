@@ -1,6 +1,7 @@
 package com.example.reserveparkingspace.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -15,6 +16,7 @@ import java.util.Set;
  */
 @Data
 @Entity
+@EqualsAndHashCode(exclude = "carList")
 public class UserEntity implements UserDetails {
 
     @Id
@@ -48,7 +50,7 @@ public class UserEntity implements UserDetails {
     /**
      * 车辆列表
      */
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<CarEntity> carList;
 
     @Override

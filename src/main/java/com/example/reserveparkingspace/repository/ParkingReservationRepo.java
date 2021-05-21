@@ -4,6 +4,7 @@ import com.example.reserveparkingspace.entity.ParkingReservationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * parking repository
@@ -20,5 +21,14 @@ public interface ParkingReservationRepo extends JpaRepository<ParkingReservation
      * @return boolean
      */
     boolean existsByParkingSpaceNumberAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(int parkingSpaceNumber, LocalDateTime startTime, LocalDateTime endTime);
+
+    /**
+     * 通过 startTime 和 endTime 获取这个时间段内的实体
+     *
+     * @param startTime startTime
+     * @param endTime   endTime
+     * @return List<ParkingReservationEntity>
+     */
+    List<ParkingReservationEntity> findAllByStartTimeGreaterThanEqualAndEndTimeLessThanEqual(LocalDateTime startTime, LocalDateTime endTime);
 
 }

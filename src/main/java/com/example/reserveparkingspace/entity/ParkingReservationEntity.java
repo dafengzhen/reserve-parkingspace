@@ -1,5 +1,6 @@
 package com.example.reserveparkingspace.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -32,5 +33,12 @@ public class ParkingReservationEntity {
      * 结束时间
      */
     private LocalDateTime endTime;
+
+    /**
+     * 车辆
+     */
+    @JsonIgnore
+    @ManyToOne
+    private CarEntity car;
 
 }

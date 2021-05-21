@@ -1,6 +1,7 @@
 package com.example.reserveparkingspace.controller;
 
 import com.example.reserveparkingspace.entity.UserEntity;
+import com.example.reserveparkingspace.other.LoginResponse;
 import com.example.reserveparkingspace.repository.UserRepo;
 import com.example.reserveparkingspace.util.JwtTokenUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;

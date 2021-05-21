@@ -2,7 +2,9 @@ package com.example.reserveparkingspace.controller;
 
 import com.example.reserveparkingspace.entity.CarEntity;
 import com.example.reserveparkingspace.entity.UserEntity;
+import com.example.reserveparkingspace.other.ParkingRequest;
 import com.example.reserveparkingspace.repository.ParkingReservationRepo;
+import com.example.reserveparkingspace.repository.UserRepo;
 import com.example.reserveparkingspace.service.ParkingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +38,9 @@ public class ParkingRestController {
 
     @Autowired
     private ParkingService parkingService;
+
+    @Autowired
+    private UserRepo userRepo;
 
     @PostMapping("/parking")
     public ResponseEntity<String> parking(@RequestBody @Valid ParkingRequest parkingRequest) {

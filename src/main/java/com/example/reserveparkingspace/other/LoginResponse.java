@@ -1,4 +1,4 @@
-package com.example.reserveparkingspace.controller;
+package com.example.reserveparkingspace.other;
 
 import lombok.Data;
 

@@ -1,6 +1,6 @@
 package com.example.reserveparkingspace.service;
 
-import com.example.reserveparkingspace.controller.ParkingRequest;
+import com.example.reserveparkingspace.other.ParkingRequest;
 
 /**
  * parking service
