@@ -49,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/api/public/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/hello").permitAll()
-                .anyRequest().permitAll();
+                .anyRequest().authenticated();
 
         http.exceptionHandling()
                 .authenticationEntryPoint((request, response, ex) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage()))

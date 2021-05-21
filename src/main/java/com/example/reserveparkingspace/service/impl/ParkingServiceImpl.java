@@ -13,8 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * parking service implement
@@ -46,18 +45,22 @@ public class ParkingServiceImpl implements ParkingService {
         parking.setStartTime(parkingRequest.getStartTime());
         parking.setEndTime(parkingRequest.getEndTime());
 
-        CarEntity car = carRepo.findByLicensePlate(parkingRequest.getLicensePlate()).orElseGet(() -> {
-            CarEntity carEntity = new CarEntity();
-            carEntity.setLicensePlate(parkingRequest.getLicensePlate());
-            carEntity.setParkingReservationList(Collections.singletonList(parking));
-            return carEntity;
-        });
+        if (user.getCarList().isEmpty()) {
+            CarEntity car = carRepo.findByLicensePlate(parkingRequest.getLicensePlate()).orElseGet(() -> {
+                CarEntity carEntity = new CarEntity();
+                carEntity.setLicensePlate(parkingRequest.getLicensePlate());
+                carEntity.setParkingReservationList(Collections.singletonList(parking));
+                return carEntity;
+            });
 
-        if (!car.getParkingReservationList().contains(parking)) {
             car.getParkingReservationList().add(parking);
+            user.getCarList().add(car);
+        } else {
+            user.getCarList().stream()
+                    .filter(carEntity -> carEntity.getLicensePlate().equals(parkingRequest.getLicensePlate()))
+                    .findFirst().ifPresent(carEntity -> carEntity.getParkingReservationList().add(parking));
         }
 
-        user.getCarList().add(car);
         userRepo.save(user);
     }
 }
