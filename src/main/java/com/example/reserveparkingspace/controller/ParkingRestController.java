@@ -70,15 +70,7 @@ public class ParkingRestController {
 
         if (carFirst.isPresent()) {
             Optional<ParkingReservationEntity> parkingFirst = carFirst.get().getParkingReservationList().stream()
-                    .filter(entity -> {
-                        if ((entity.getStartTime().isBefore(parkingRequest.getStartTime()) || entity.getStartTime().isEqual(parkingRequest.getStartTime()))
-                                && (entity.getEndTime().isAfter(parkingRequest.getStartTime()))) {
-                            return true;
-                        }
-
-                        return (entity.getStartTime().isBefore(parkingRequest.getEndTime()) || entity.getStartTime().isEqual(parkingRequest.getEndTime()))
-                                && (entity.getEndTime().isAfter(parkingRequest.getEndTime()));
-                    })
+                    .filter(entity -> checkParkingSpaceReservation(entity.getParkingSpaceNumber(), startTime, endTime))
                     .findFirst();
 
             if (parkingFirst.isPresent()) {
@@ -89,10 +81,7 @@ public class ParkingRestController {
         // 判断是否有空余时间段的停车位
         List<Integer> remainingNumbers = new ArrayList<>(parkingSpaces);
         for (int i = 0; i < parkingSpaces; i++) {
-            if (
-                    !parkingReservationRepo.existsByParkingSpaceNumberAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(i, startTime, startTime) ||
-                            !parkingReservationRepo.existsByParkingSpaceNumberAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(i, endTime, endTime)
-            ) {
+            if (!checkParkingSpaceReservation(i, startTime, endTime)) {
                 // 记录该时间段可以停车的车位号
                 remainingNumbers.add(i);
             }
@@ -112,6 +101,19 @@ public class ParkingRestController {
     @GetMapping("myParkingList")
     public ResponseEntity<Set<CarEntity>> myParkingList(Authentication authentication) {
         return ResponseEntity.ok().body(((UserEntity) authentication.getPrincipal()).getCarList());
+    }
+
+    /**
+     * 检查车位预约
+     *
+     * @param parkingSpaceNumber parkingSpaceNumber
+     * @param startTime          startTime
+     * @param endTime            endTime
+     * @return boolean
+     */
+    private boolean checkParkingSpaceReservation(int parkingSpaceNumber, LocalDateTime startTime, LocalDateTime endTime) {
+        return parkingReservationRepo.existsByParkingSpaceNumberAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(parkingSpaceNumber, startTime, startTime) ||
+                parkingReservationRepo.existsByParkingSpaceNumberAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(parkingSpaceNumber, endTime, endTime);
     }
 
 }
