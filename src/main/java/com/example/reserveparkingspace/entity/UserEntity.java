@@ -50,7 +50,7 @@ public class UserEntity implements UserDetails {
     /**
      * 车辆列表
      */
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private Set<CarEntity> carList;
 
     @Override

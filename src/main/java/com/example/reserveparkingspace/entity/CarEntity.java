@@ -29,7 +29,7 @@ public class CarEntity {
     /**
      * 停车位预约列表
      */
-    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "car", fetch = FetchType.EAGER)
     private List<ParkingReservationEntity> parkingReservationList;
 
     /**

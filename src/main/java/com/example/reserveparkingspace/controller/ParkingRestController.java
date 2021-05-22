@@ -5,16 +5,12 @@ import com.example.reserveparkingspace.entity.ParkingReservationEntity;
 import com.example.reserveparkingspace.entity.UserEntity;
 import com.example.reserveparkingspace.other.ParkingRequest;
 import com.example.reserveparkingspace.repository.ParkingReservationRepo;
-import com.example.reserveparkingspace.repository.UserRepo;
 import com.example.reserveparkingspace.service.ParkingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
@@ -36,9 +32,6 @@ public class ParkingRestController {
 
     @Autowired
     private ParkingService parkingService;
-
-    @Autowired
-    private UserRepo userRepo;
 
     @PostMapping("/parking")
     public ResponseEntity<String> parking(@RequestBody @Valid ParkingRequest parkingRequest, Authentication authentication) {
@@ -98,9 +91,19 @@ public class ParkingRestController {
         return ResponseEntity.ok().body("预约停车位成功");
     }
 
-    @GetMapping("myParkingList")
+    @GetMapping("/myParkingList")
     public ResponseEntity<Set<CarEntity>> myParkingList(Authentication authentication) {
         return ResponseEntity.ok().body(((UserEntity) authentication.getPrincipal()).getCarList());
+    }
+
+    @GetMapping("/cancel")
+    public ResponseEntity<String> cancelReservation(@RequestParam Long id) {
+        try {
+            parkingReservationRepo.deleteById(id);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("取消预约失败");
+        }
+        return ResponseEntity.ok().body("取消预约完成");
     }
 
     /**
