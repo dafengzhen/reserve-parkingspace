@@ -37,7 +37,10 @@ public class ParkingRestController {
     public ResponseEntity<String> parking(@RequestBody @Valid ParkingRequest parkingRequest, Authentication authentication) {
         final LocalDateTime startTime = parkingRequest.getStartTime();
         final LocalDateTime endTime = parkingRequest.getEndTime();
-        final int year = LocalDateTime.now().getYear();
+        final LocalDateTime now = LocalDateTime.now();
+        final int year = now.getYear();
+        final int month = now.getMonth().getValue();
+        final int dayOfMonth = now.getDayOfMonth();
 
         if (startTime.isEqual(endTime)) {
             return ResponseEntity.badRequest().body("时间不能相等");
@@ -48,6 +51,20 @@ public class ParkingRestController {
         }
 
         if (startTime.getYear() < year || endTime.getYear() < year) {
+            return ResponseEntity.badRequest().body("无法预约过去时间");
+        }
+
+        if (
+                startTime.getYear() == year &&
+                        (startTime.getMonth().getValue() < month || endTime.getMonth().getValue() < month)
+        ) {
+            return ResponseEntity.badRequest().body("无法预约过去时间");
+        }
+
+        if (
+                startTime.getYear() == year && startTime.getMonth().getValue() == month &&
+                        (startTime.getDayOfMonth() < dayOfMonth || endTime.getDayOfMonth() < dayOfMonth)
+        ) {
             return ResponseEntity.badRequest().body("无法预约过去时间");
         }
 
