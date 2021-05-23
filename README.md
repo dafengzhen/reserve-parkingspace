@@ -8,6 +8,19 @@
 - jpa
 - mysql
 
+# 使用说明
+
+需要配置如下属性
+
+**application.properties**
+```properties
+# 小程序 appId
+appId = xxx
+
+# 小程序 appSecret
+appSecret = xxx
+```
+
 # 主要功能
 
 - 微信登录
