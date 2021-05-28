@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,11 +31,12 @@ public class ListRestController {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startTime = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), 0, 0);
         LocalDateTime endTime = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), 23, 59);
-        return ResponseEntity.ok().body(
-                parkingReservationRepo.findAllByStartTimeGreaterThanEqualAndEndTimeLessThanEqual(startTime, endTime).stream()
-                        .map(ParkingReservationEntity::getCar)
-                        .collect(Collectors.toSet())
+        List<ParkingReservationEntity> list = parkingReservationRepo.findAllByStartTimeGreaterThanEqualAndEndTimeLessThanEqual(startTime, endTime);
+        Set<CarEntity> cars = list.stream().map(ParkingReservationEntity::getCar).collect(Collectors.toSet());
+        cars.forEach(carEntity -> carEntity.setParkingReservationList(
+                carEntity.getParkingReservationList().stream().filter(list::contains).collect(Collectors.toList()))
         );
+        return ResponseEntity.ok().body(cars);
     }
 
 }
