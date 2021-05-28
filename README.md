@@ -11,7 +11,6 @@
 # 使用说明
 
 需要配置如下属性
-
 **application.properties**
 ```properties
 # 小程序 appId
@@ -20,6 +19,8 @@ appId = xxx
 # 小程序 appSecret
 appSecret = xxx
 ```
+
+其他配置也在 application.properties 文件中
 
 # 主要功能
 
